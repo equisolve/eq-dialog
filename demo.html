@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="eq-dialog.js"></script>
+    <title>EQ Modal Test Page</title>
+    <style>
+        body:has(dialog[open]) {
+            overflow: hidden;
+            scrollbar-gutter: stable;
+        }
+        dialog video {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h1>Test Modal</h1>
+<button type="button" class="eq-dialog" data-target="#target-dialog">Show Dialog</button>
+<div class="dialog" id="target-dialog">
+    <h2>Dialog Title</h2>
+    <p>Lorem Ipsum</p>
+</div>
+<div class="dialog" id="default-popup">
+    <h2>Dialog popup</h2>
+    <p>This dialog pops up by default</p>
+</div>
+<hr>
+<h1>Test Modal Image</h1>
+<a href="https://content.equisolve-dev.com/_e304d32a44775ff6cfb396c1da153b7f/ct53/db/3453/31331/image.svg" type="button" class="eq-dialog">Show Image Dialog</a>
+<hr>
+<h1>Video Test</h1>
+<a href="placeholder.mp4" class="eq-dialog">Test Video</a>
+<script>
+    (function() {
+        let dialog = new EqDialog();
+        dialog.init();
+        let dialog2 = new EqDialog();
+        dialog2.open('inline', 'default-popup');
+    })();
+</script>
+</body>
+</html>
