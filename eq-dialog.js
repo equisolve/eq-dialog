@@ -35,6 +35,30 @@ class EqDialog {
                 }
             }
         }
+        
+        // Listen for tab press, if modal is open keep focus locked
+        document.addEventListener('keydown', (e) => {
+            let dialog = document.querySelector('dialog[open]');
+            if (!dialog) {
+                return;
+            }
+            // Dynamically find all focusable elements and determine the first and last one
+            let dialog_focusables = dialog.querySelectorAll('a[href],area[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe,object,embed,*[tabindex],*[contenteditable]');
+            let first_focus = dialog_focusables.item(0);
+            let last_focus = dialog_focusables.item(dialog_focusables.length - 1);
+            if (!e.shiftKey && e.key === 'Tab') {
+                if (document.activeElement == last_focus) {
+                    e.preventDefault();
+                    first_focus.focus();
+                }
+            }
+            if (e.shiftKey && e.key === 'Tab') {
+                if (document.activeElement == first_focus) {
+                    e.preventDefault();
+                    last_focus.focus();
+                }
+            }
+        });
     }
 
     // Find all dialog buttons/links and generate HTML
