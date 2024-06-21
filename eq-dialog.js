@@ -1,5 +1,5 @@
 /* EqDialog class
- * Helper class to provide Fancybox functionality using the native HTML dialog element
+ * Helper class to provide Fancybox create_dialogality using the native HTML dialog element
  *
  * See MDN documentation for details on how the native element works
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
@@ -25,7 +25,7 @@ eq_dialog_defaults.template_video = `<video class="eq-dialog-video" controls aut
 
 class EqDialog {
     constructor(options = {}) {
-        this.settings = eq_dialog_defaults;
+        this.settings = JSON.parse(JSON.stringify(eq_dialog_defaults));
         // override defaults if provided
         for (const prop in options) {
             this.settings[prop] = options[prop];
@@ -35,7 +35,7 @@ class EqDialog {
                 }
             }
         }
-        
+
         // Listen for tab press, if modal is open keep focus locked
         document.addEventListener('keydown', (e) => {
             let dialog = document.querySelector('dialog[open]');
@@ -43,17 +43,17 @@ class EqDialog {
                 return;
             }
             // Dynamically find all focusable elements and determine the first and last one
-            let dialog_focusables = dialog.querySelectorAll('a[href],area[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe,object,embed,*[tabindex],*[contenteditable]');
+            let dialog_focusables = dialog.querySelectorAll('button,input,select,textarea,iframe,area,a,*[tabindex="0"]');
             let first_focus = dialog_focusables.item(0);
             let last_focus = dialog_focusables.item(dialog_focusables.length - 1);
             if (!e.shiftKey && e.key === 'Tab') {
-                if (document.activeElement == last_focus) {
+                if (document.activeElement === last_focus) {
                     e.preventDefault();
                     first_focus.focus();
                 }
             }
             if (e.shiftKey && e.key === 'Tab') {
-                if (document.activeElement == first_focus) {
+                if (document.activeElement === first_focus) {
                     e.preventDefault();
                     last_focus.focus();
                 }
