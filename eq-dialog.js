@@ -12,7 +12,7 @@ const eq_dialog_defaults = {
     // remove_inline_content: takes inline divs used for content and removes duplicates
     remove_inline_content: false,
     style: {
-        width: '600px',
+        width: '800px',
     }
 }
 // Default HTML template for dialog content
@@ -35,7 +35,7 @@ class EqDialog {
                 }
             }
         }
-
+        
         // Listen for tab press, if modal is open keep focus locked
         document.addEventListener('keydown', (e) => {
             let dialog = document.querySelector('dialog[open]');
@@ -47,13 +47,13 @@ class EqDialog {
             let first_focus = dialog_focusables.item(0);
             let last_focus = dialog_focusables.item(dialog_focusables.length - 1);
             if (!e.shiftKey && e.key === 'Tab') {
-                if (document.activeElement === last_focus) {
+                if (document.activeElement == last_focus) {
                     e.preventDefault();
                     first_focus.focus();
                 }
             }
             if (e.shiftKey && e.key === 'Tab') {
-                if (document.activeElement === first_focus) {
+                if (document.activeElement == first_focus) {
                     e.preventDefault();
                     last_focus.focus();
                 }
@@ -91,22 +91,24 @@ class EqDialog {
             }
             // Create an ID to assign to the dialog, take the existing ID attribute if there is one
             dialog_id = dialog_type === 'inline' && src ? src.substring(1) : this.generate_dialog_id(dialog_type);
-            let dlg = this.create_dialog({
-                dialog_type: dialog_type,
-                dialog_id: dialog_id,
-                src: src,
-                img_alt: el.dataset.imgAlt ? el.dataset.imgAlt : '',
-                close_button_text: el.dataset.closeBtnTxt ? el.dataset.closeBtnTxt : this.settings.close_button_text
-            });
-            if (!dlg) {
-                return;
-            }
+            
             // Converts URL links to anchor link to prevent navigating away from page
             if (href) {
                 el.setAttribute('href', `#${dialog_id}`);
             }
             // Assign event listeners the link/button to open the modal
-            el.addEventListener('click', () => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                let dlg = this.create_dialog({
+                    dialog_type: dialog_type,
+                    dialog_id: dialog_id,
+                    src: src,
+                    img_alt: el.dataset.imgAlt ? el.dataset.imgAlt : '',
+                    close_button_text: el.dataset.closeBtnTxt ? el.dataset.closeBtnTxt : this.settings.close_button_text
+                });
+                if (!dlg) {
+                    return;
+                }
                 dlg.showModal();
             });
         });
@@ -161,11 +163,11 @@ class EqDialog {
                 return false;
             }
             dialog_content += inline_div.innerHTML;
-            // Remove target inline div or remove the ID to prevent duplicate ID error
+            // Hide target inline div to prevent duplicate ID error
             if (this.settings.remove_inline_content) {
                 inline_div.remove();
             } else {
-                inline_div.removeAttribute('id');
+                inline_div.style.display = 'none';
             }
         }
         if (params.dialog_type === 'image') {
@@ -180,7 +182,7 @@ class EqDialog {
             dialog_content += vid_tpl;
         }
         if (params.dialog_type === 'iframe') {
-            dialog_content += `<iframe src="${params.src}">`;
+            dialog_content += `<iframe src="${params.src}"></iframe>`;
         }
 
         // Apply styling
@@ -191,6 +193,17 @@ class EqDialog {
         // Add content to dialog and add it to the DOM
         inner_el.innerHTML = dialog_content;
         document.body.appendChild(dialog);
+
+        // Add event listener to hide the dialog and show the inline content again when it is closed
+        dialog.addEventListener('close', () => {
+            if (params.dialog_type === 'inline' && !this.settings.remove_inline_content) {
+                let inline_div = document.getElementById(params.dialog_id);
+                if (inline_div) {
+                    inline_div.style.display = '';
+                }
+            }
+            dialog.remove();
+        });
 
         return dialog;
     }
